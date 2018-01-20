@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+{% block content %}
+  <nav class="col-md-2 left-container" >
+    <ul class="nav navbar-success flex-column">
+      {% for category in categories %}
+        <li class='nav-item'>
+          <a href="/categories/{{ category.id }}" class="nav-link">
+            {{ category.name }}
+          </a>
+        </li>
+      {% endfor %}
+  </nav>
+
+
+  <div class='right-container'>
+    <div class='flash'>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul>
+            {% for message in messages %}
+              <li><Strong>{{ message }}</strong></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <div class='lastest-items'>
+    </div>
+  </div>
+
+{% endblock %}

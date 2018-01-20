@@ -1,0 +1,46 @@
+.header {
+  background-color: #f9a095;
+  min-height: 80px;
+  display: flex;
+  vertical-align: middle;
+  line-height: 80px;
+}
+
+.header-text,
+.header-text-link {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.header-text-link:hover {
+  color: #fff;
+}
+
+.title {
+  display: inline-block;
+  text-align: left;
+  width: 50%;
+  margin-left: 50px;
+}
+
+.user {
+  text-align: right;
+  width: 50%;
+  margin-right: 20px;
+  vertical-align: middle;
+}
+
+.left-container {
+  position: fixed;
+  height: 100%;
+  border-right: 1px solid #e5e5e5;
+  max-width: 200px;
+}
+
+/*.nav-color {
+  color: rgba(249,160,149, 0.8);
+}
+
+.nav-color:hover {
+  color: #fff;
+  background-color: #f9a095;
+}*/
