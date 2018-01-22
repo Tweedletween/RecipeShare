@@ -1,7 +1,8 @@
 {% extends "main.html" %}
 {% block content %}
-  <nav class="col-md-2 left-container" >
-    <ul class="nav navbar-success flex-column">
+  <nav class="col-md-2 left-container justify-content-center">
+    <h2 class="nav-title">Categories</h2>
+    <ul class="nav flex-column">
       {% for category in categories %}
         <li class='nav-item'>
           <a href="/categories/{{ category.id }}" class="nav-link">
@@ -11,22 +12,46 @@
       {% endfor %}
   </nav>
 
+  <div class="vertical-separator">
+  </div>
 
-  <div class='right-container'>
-    <div class='flash'>
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          <ul>
-            {% for message in messages %}
-              <li><Strong>{{ message }}</strong></li>
-            {% endfor %}
+  <main>
+    <div class='right-container'>
+      <div class='flash'>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="list-unstyled">
+              {% for message in messages %}
+                <li class='alert alert-success'><Strong>{{ message }}</strong></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="card col-md-3 col-sm-6 col-xs-12">
+        <div class="card-block text-center">
+          <a href="{{url_for('newItem', category_id=categories[0].id)}}" class="card-link"><i class="fa fa-plus fa-5x" aria-hidden="true"></i><br>Add A Recipe</a>
+        </div>
+      </div>
+      <br>
+
+      <h3>Latest Recipe Items!!!</h3>
+      <div>
+        {% if not com_items %}
+          <h1 text-warning>No Recipe Items</h1>
+        {% else %}
+          <ul class="list-group col-md-8 col-sm-12">
+            {% for item, cat in com_items %}
+              <li class="list-group-item">
+                <a href="{{url_for('viewItem', id=item.id)}}">{{ item.name }}</a>
+                <span class="badge badge-secondary float-right">{{ cat.name }}</span>
+              </li>
+              {% endfor %}
           </ul>
         {% endif %}
-      {% endwith %}
+      </div>
     </div>
-
-    <div class='lastest-items'>
-    </div>
-  </div>
+  </main>
 
 {% endblock %}

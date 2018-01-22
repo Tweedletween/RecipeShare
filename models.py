@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, BLOB, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.dialects.sqlite import BLOB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
@@ -17,9 +18,11 @@ class Category(Base):
 class Item(Base):
     __tablename__ = 'item'
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String(50), nullable=False)
     pic = Column(BLOB)
-    steps = Column(String, nullable=False)
+    pic_type = Column(String)
+    ingredients = Column(String(300), nullable=False)
+    steps = Column(String(10000), nullable=False)
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
 

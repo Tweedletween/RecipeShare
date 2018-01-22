@@ -1,0 +1,57 @@
+{% extends "main.html" %}
+{% block content %}
+  <main class="form" >
+    <h1>{{ title }}</h1>
+    <div class='alert alert-success'>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="list-unstyled">
+            {% for message in messages %}
+              <li><Strong>{{ message }}</strong></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <form action="{{ url_for('newItem', category_id=default_category_id) }}" enctype="multipart/form-data" method='post' class="col-md-8 col-sm-12">
+      <div class="form-group">
+				<label for="name">Name:</label>
+				<input type ="text" maxlength="50" class="form-control" name="name" required autofocus placeholder="Recipe Name">
+      </div>
+
+      <div class="form-group">
+				<label for="ingredients">Ingredients:</label>
+				<textarea class="form-control" maxlength="300" rows="3" name="ingredients" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="steps">Steps:</label>
+				<textarea class="form-control" maxlength="1000" rows="5" name="steps" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="category_id">Category:</label>
+        <select class="form-control" name="category_id">
+          {% for category in categories %}
+            <option value={{ category.id }} {% if category.id == default_category_id %} selected {% endif %}>{{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="pic">Picture:</label>
+        <input type="file" class="form-control-file" name="pic">
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-outline-info w-50 btn-group-justified" id="submit" type="submit">
+				  <span class="glyphicon glyphicon-glass" aria-hidden="true"></span>Create</button>
+			</div>
+    </form>
+
+    <br>
+    <br>
+  </main>
+
+{% endblock %}

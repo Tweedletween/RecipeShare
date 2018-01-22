@@ -1,0 +1,65 @@
+{% extends "main.html" %}
+{% block content %}
+  <nav class="left-container col-md-2 justify-content-center" >
+    <h2 class="nav-title">Categories</h2>
+    <ul class="nav flex-column">
+      {% for category in categories %}
+        <li class='nav-item'>
+          <a href="/categories/{{ category.id }}" class="nav-link">
+            {{ category.name }}
+          </a>
+        </li>
+      {% endfor %}
+  </nav>
+
+  <div class="vertical-separator">
+  </div>
+
+  <main>
+    <div class='right-container'>
+      <h1>{{ title }}</h1>
+      <div class='flash'>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="list-unstyled">
+              {% for message in messages %}
+                <li class='alert alert-success'><Strong>{{ message }}</strong></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <!--div class="card-columns"-->
+      <div class="card-columns">
+        <div class="card">
+          <div class="card-block text-center">
+            <a href="{{url_for('newItem', category_id=category_id)}}" class="card-link"><i class="fa fa-plus fa-5x" aria-hidden="true"></i><br>Add A Recipe</a>
+          </div>
+        </div>
+
+        {% for item in items %}
+          <div class="card card-block bg-light">
+            {% if item.pic %}
+              <img class="card-img-top img-fluid border-secondary" src="data:image/jpeg;base64,{{ item.pic }}" alt="Recipe Item Picture">
+            {% else %}
+              <img class="card-img-top img-fluid border-secondary" src="/static/food.jpg" alt="Default Recipe Item Picture">
+            {% endif %}
+
+            <div class="card-body">
+              <h5 class="card-title">{{ item.name }}</h5>
+              <p class="card-text">{{ item.steps[:50] }} {% if item.steps|length > 50 %} ... {% endif %}</p>
+            </div>
+
+            <div class="card-footer text-center">
+              <a href="{{url_for('viewItem', id=item.id)}}" class="card-link small">View</a>
+              <a href="{{url_for('editItem', id=item.id)}}" class="card-link small">Edit</a>
+              <a href="{{url_for('deleteItem', id=item.id)}}" class="card-link small text-danger">Delete</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </main>
+
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "main.html" %}
+{% block content %}
+  <main>
+    <div class='flash'>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul>
+            {% for message in messages %}
+              <li><Strong>{{ message }}</strong></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <h1>{{ item.name }}</title>
+
+    <h5>Ingredients</h5>
+    <p>{{ item.ingredients }}</p>
+
+    <h5>Steps</h5>
+    <p>{{ item.steps }}</p>
+
+    <h5>Category</h5>
+    <p>{{ category.name }}</p>
+
+    <div class="text-center">
+    {% if item.pic %}
+      <img class="img-fluid col-md-6 col-sm-10 text-center" src="data:image/jpeg;base64,{{ item.pic }}" alt="Recipe Item Picture">
+    {% else %}
+      <img class="img-fluid col-md-6 col-sm-10 text-center" src="/static/food.jpg" alt="Default Recipe Item Picture">
+    {% endif %}
+    </div>
+
+    <br><br>
+
+  </main>
+
+{% endblock %}
