@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash,json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Base, Category, Item
-from base64 import b64encode
+import random, string
 
 app = Flask(__name__)
 
@@ -11,6 +11,9 @@ engine = create_engine('sqlite:///recipies.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
+SAVE_PIC_PRE = '/static/imgs/'
 
 
 @app.route('/')
@@ -55,13 +58,20 @@ def newItem(category_id):
         if 'name' not in request.form or 'steps' not in request.form or 'ingredients' not in request.form:
             return jsonify("Error, required value not entered!")
 
-        # Store new data into DB
+        # Store uploaded image to local folder
         print("request.files['pic']: %s" % request.files['pic'])
+        if 'pic' in request.files:
+            pic_name = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+            pic_type = request.files['pic'].content_type.split('/')[-1]
+            pic_path = SAVE_PIC_PRE + pic_name + '.' + pic_type
+            request.files['pic'].save('.' + pic_path)
+
+        # Store new data into DB
         newItem = Item(name=request.form.get('name'),
             ingredients=request.form.get('ingredients'),
             steps=request.form.get('steps'),
             category_id=target_category.id,
-            pic=b64encode(request.files['pic'].read()))
+            pic_path=pic_path)
         session.add(newItem)
         session.commit()
         flash("New Item Created!")
@@ -89,12 +99,23 @@ def editItem(id):
         if 'name' not in request.form or 'steps' not in request.form or 'ingredients' not in request.form:
             return jsonify("Error, required value not entered!")
 
+        # Store uploaded image to local folder
+        print("request.files['pic']: %s" % request.files['pic'])
+        if 'pic' in request.files:
+            if not request.files['pic'].content_type.startswith('image'):
+                return jsonify("Error, not image file type!")
+            pic_name = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+            pic_type = request.files['pic'].content_type.split('/')[-1]
+            pic_path = SAVE_PIC_PRE + pic_name + '.' + pic_type
+            request.files['pic'].save('.' + pic_path)
+
         # Update the data in DB
         item.name = request.form['name']
         item.ingredients = request.form['ingredients']
         item.steps = request.form['steps']
         item.category_id = target_category.id
-        item.pic = b64encode(request.files['pic'].read())
+        if request.files['pic']:
+            item.pic_path = pic_path
         session.add(item)
         session.commit()
         flash("Category Modified")

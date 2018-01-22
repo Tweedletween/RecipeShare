@@ -19,8 +19,7 @@ class Item(Base):
     __tablename__ = 'item'
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
-    pic = Column(BLOB)
-    pic_type = Column(String)
+    pic_path = Column(String)
     ingredients = Column(String(300), nullable=False)
     steps = Column(String(10000), nullable=False)
     category_id = Column(Integer, ForeignKey('category.id'))

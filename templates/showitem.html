@@ -25,8 +25,8 @@
     <p>{{ category.name }}</p>
 
     <div class="text-center">
-    {% if item.pic %}
-      <img class="img-fluid col-md-6 col-sm-10 text-center" src="data:image/jpeg;base64,{{ item.pic }}" alt="Recipe Item Picture">
+    {% if item.pic_path %}
+      <img class="img-fluid col-md-6 col-sm-10 text-center" src="{{ item.pic_path }}" alt="Recipe Item Picture">
     {% else %}
       <img class="img-fluid col-md-6 col-sm-10 text-center" src="/static/food.jpg" alt="Default Recipe Item Picture">
     {% endif %}

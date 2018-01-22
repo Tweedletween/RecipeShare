@@ -2,12 +2,12 @@
 {% block content %}
   <main class="form" >
     <h1>{{ title }}</h1>
-    <div class='alert alert-success'>
+    <div class='flash'>
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="list-unstyled">
             {% for message in messages %}
-              <li><Strong>{{ message }}</strong></li>
+              <li class='alert alert-success'><Strong>{{ message }}</strong></li>
             {% endfor %}
           </ul>
         {% endif %}

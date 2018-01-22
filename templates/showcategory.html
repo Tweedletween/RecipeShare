@@ -40,8 +40,8 @@
 
         {% for item in items %}
           <div class="card card-block bg-light">
-            {% if item.pic %}
-              <img class="card-img-top img-fluid border-secondary" src="data:image/jpeg;base64,{{ item.pic }}" alt="Recipe Item Picture">
+            {% if item.pic_path %}
+              <img class="card-img-top img-fluid border-secondary" src="{{ item.pic_path }}" alt="Recipe Item Picture">
             {% else %}
               <img class="card-img-top img-fluid border-secondary" src="/static/food.jpg" alt="Default Recipe Item Picture">
             {% endif %}
