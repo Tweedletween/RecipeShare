@@ -16,7 +16,7 @@ class User(Base):
     name = Column(String(250), nullable=False)
     picture = Column(String(250))
     email = Column(String(250), nullable=False)
-    
+
 
 class Category(Base):
     __tablename__ = 'category'
@@ -33,6 +33,8 @@ class Item(Base):
     steps = Column(String(10000), nullable=False)
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
 
 engine = create_engine('sqlite:///recipies.db')

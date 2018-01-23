@@ -276,7 +276,9 @@ def viewItem(id):
 
 @app.route('/categories/<int:category_id>/items/new', methods=['GET', 'POST'])
 def newItem(category_id):
-    print("In newItem, request.form: %s" % request.form)
+    if 'username' not in login_session:
+         return redirect('/login')
+
     if request.method == 'POST':
         # Check data valid
         if 'category_id' not in request.form:
@@ -288,7 +290,6 @@ def newItem(category_id):
             return jsonify("Error, required value not entered!")
 
         # Store uploaded image to local folder
-        print("request.files['pic']: %s" % request.files['pic'])
         if 'pic' in request.files:
             pic_name = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
             pic_type = request.files['pic'].content_type.split('/')[-1]
@@ -300,7 +301,8 @@ def newItem(category_id):
             ingredients=request.form.get('ingredients'),
             steps=request.form.get('steps'),
             category_id=target_category.id,
-            pic_path=pic_path)
+            pic_path=pic_path,
+            user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
         flash("New Item Created!")
@@ -313,10 +315,15 @@ def newItem(category_id):
 
 @app.route('/categories/items/<int:id>/edit', methods=['GET', 'POST'])
 def editItem(id):
+    if 'username' not in login_session:
+         return redirect('/login')
+
     # Check the item to be updated valid
     item = session.query(Item).filter_by(id=id).first()
     if item is None:
         return jsonify("Item not Existed!")
+    if item.user_id != login_session['user_id']:
+        return jsonify("You do not have the right to modify this item!")
 
     if request.method == 'POST':
         # Check data valid
@@ -357,10 +364,15 @@ def editItem(id):
 
 @app.route('/categories/items/<int:id>/delete', methods=['GET', 'POST'])
 def deleteItem(id):
+    if 'username' not in login_session:
+          return redirect('/login')
+
     # Check the item to be deleted valid
     item = session.query(Item).filter_by(id=id).first()
     if item is None:
         return jsonify("Item not Existed!")
+    if item.user_id != login_session['user_id']:
+        return jsonify("You do not have the right to modify this item!")
 
     if request.method == 'POST':
         session.delete(item)

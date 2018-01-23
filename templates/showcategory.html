@@ -53,8 +53,10 @@
 
             <div class="card-footer text-center">
               <a href="{{url_for('viewItem', id=item.id)}}" class="card-link small">View</a>
-              <a href="{{url_for('editItem', id=item.id)}}" class="card-link small">Edit</a>
-              <a href="{{url_for('deleteItem', id=item.id)}}" class="card-link small text-danger">Delete</a>
+              {% if session['user_id'] == item.user_id %}
+                <a href="{{url_for('editItem', id=item.id)}}" class="card-link small">Edit</a>
+                <a href="{{url_for('deleteItem', id=item.id)}}" class="card-link small text-danger">Delete</a>
+              {% endif %}
             </div>
           </div>
         {% endfor %}
