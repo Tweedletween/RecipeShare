@@ -36,6 +36,16 @@ class Item(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
+    @property
+    # Return object data in easily serialized format
+    def serialize(self):
+        return {
+            'name': self.name,
+            'ingredients': self.ingredients,
+            'steps': self.steps,
+            'category': self.category.name,
+        }
 
-engine = create_engine('sqlite:///recipies.db')
+
+engine = create_engine('sqlite:///recipes.db')
 Base.metadata.create_all(engine)

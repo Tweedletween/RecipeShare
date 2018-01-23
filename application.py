@@ -15,7 +15,7 @@ import requests
 app = Flask(__name__)
 
 # Connect to DB and create session
-engine = create_engine('sqlite:///recipies.db')
+engine = create_engine('sqlite:///recipes.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
@@ -383,6 +383,19 @@ def deleteItem(id):
         title = "Delete Item?"
         category = session.query(Category).filter_by(id=item.category_id).one()
         return render_template('deleteitem.html', item=item, category=category, title=title)
+
+
+@app.route('/latest_items/JSON')
+def latestItemJSON():
+    com_items = session.query(Item, Category).filter(Item.category_id==Category.id).order_by(Item.id.desc()).limit(10)
+    return jsonify(latest_tems=[item.serialize for item, cat in com_items])
+
+
+@app.route('/categories/<int:category_id>/items/JSON')
+def categoryItemsJSON(category_id):
+    items = session.query(Item).filter_by(category_id=category_id).all()
+    print(items)
+    return jsonify(items=[item.serialize for item in items])
 
 
 if __name__ == '__main__':

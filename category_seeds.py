@@ -4,7 +4,7 @@ from models import Base, Category
 
 
 # Connect to DB and create session
-engine = create_engine('sqlite:///recipies.db')
+engine = create_engine('sqlite:///recipes.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
