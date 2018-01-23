@@ -133,6 +133,58 @@ def getUserIdByEmail(email):
     except:
         return None
 
+# Facebook login
+@app.route('/fbconnect', methods=['POST'])
+def fbconnect():
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    access_token = request.data
+
+    app_id = json.loads(open('fb_client_secret.json', 'r').read())['web']['app_id']
+    app_secret = json.loads(
+        open('fb_client_secret.json', 'r').read())['web']['app_secret']
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+        app_id, app_secret, access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+
+    url = 'https://graph.facebook.com/v2.8/me?access_token=%s&fields=name,id,email' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+
+    data = json.loads(result)
+    login_session['provider'] = 'facebook'
+    login_session['username'] = data["name"]
+    login_session['email'] = data["email"]
+    login_session['fb_id'] = data["id"]
+    # The token must be stored in the login_session in order to properly logout
+    login_session['access_token'] = access_token
+
+    # Get user picture
+    url = 'https://graph.facebook.com/v2.8/me/picture?access_token=%s&redirect=0&height=200&width=200' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    data = json.loads(result)
+    login_session['picture'] = data["data"]["url"]
+
+    # see if user exists
+    user_id = getUserIdByEmail(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    flash("Now logged in as %s" % login_session['username'])
+    return output
+
 
 # Disconnect based on provider
 @app.route('/disconnect')
@@ -141,6 +193,9 @@ def disconnect():
         if login_session['provider'] == 'google':
             gdisconnect()
             del login_session['g_id']
+        if login_session['provider'] == 'facebook':
+            fbdisconnect()
+            del login_session['fb_id']
         del login_session['username']
         del login_session['email']
         del login_session['picture']
@@ -176,6 +231,18 @@ def gdisconnect():
         response = make_response(json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
+
+# Facebook Disconnect
+# Revoke a current user's token and reset their login_session
+@app.route('/fbdisconnect')
+def fbdisconnect():
+    facebook_id = login_session['fb_id']
+    # The access token must me included to successfully logout
+    access_token = login_session['access_token']
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'DELETE')[1]
+    return "you have been logged out"
 
 
 @app.route('/')
