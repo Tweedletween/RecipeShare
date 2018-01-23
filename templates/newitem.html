@@ -22,12 +22,12 @@
 
       <div class="form-group">
 				<label for="ingredients">Ingredients:</label>
-				<textarea class="form-control" maxlength="300" rows="3" name="ingredients" required></textarea>
+				<textarea class="form-control" maxlength="300" rows="3" name="ingredients" id="ingredients" required></textarea>
       </div>
 
       <div class="form-group">
         <label for="steps">Steps:</label>
-				<textarea class="form-control" maxlength="1000" rows="5" name="steps" required></textarea>
+				<textarea class="form-control" maxlength="2000" rows="5" name="steps" id="steps" required></textarea>
       </div>
 
       <div class="form-group">
@@ -52,6 +52,23 @@
 
     <br>
     <br>
+
+    <script>
+      $('ingredients').keypress(function(event) {
+        if (event.which == 13) {
+          event.preventDefault();
+          var s = $(this).val();
+          $(this).val(s+"\n");
+        }
+      });​
+      $('steps').keypress(function(event) {
+        if (event.which == 13) {
+          event.preventDefault();
+          var s = $(this).val();
+          $(this).val(s+"\n");
+        }
+      });​
+    </script>
   </main>
 
 {% endblock %}

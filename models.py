@@ -30,7 +30,7 @@ class Item(Base):
     name = Column(String(50), nullable=False)
     pic_path = Column(String)
     ingredients = Column(String(300), nullable=False)
-    steps = Column(String(10000), nullable=False)
+    steps = Column(String(2000), nullable=False)
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey('user.id'))
