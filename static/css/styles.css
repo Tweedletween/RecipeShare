@@ -66,6 +66,14 @@
   top: 20px;
 }
 
+.login-box {
+  height: 100%;
+  width: 100%;
+  vertical-align: middle;
+  text-align: center;
+  padding-top: 30px;
+}
+
 /* Set main element to be 100% as wide as parent, incase the flex parent makes it shrink */
 main {
   width: 100%;

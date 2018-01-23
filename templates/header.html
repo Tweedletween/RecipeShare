@@ -9,7 +9,11 @@
     </div>
 
     <div class='user'>
-      <a class='header-text-link' href='#'>Click Here to Login</a>
+      {% if 'username' not in session: %}
+			<a class='header-text-link' href={{url_for('showLogin')}}>Click Here To Login</a>
+  		{% else: %}
+  			<a class='header-text-link' href={{url_for('disconnect')}}>Disconnect</a>
+  		{% endif %}
     </div>
   </div>
 </header>
