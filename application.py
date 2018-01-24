@@ -11,6 +11,10 @@ from flask import make_response
 import httplib2
 import requests
 
+from flask import g
+from rateLimit import RateLimit
+from functools import update_wrapper
+
 
 app = Flask(__name__)
 
@@ -385,13 +389,50 @@ def deleteItem(id):
         return render_template('deleteitem.html', item=item, category=category, title=title)
 
 
+def get_view_rate_limit():
+    return getattr(g, '_view_rate_limit', None)
+
+
+def on_over_limit(limit):
+    return (jsonify({'data':'You hit the rate limit','error':'429'}),429)
+
+
+def ratelimit(limit, per=60, send_x_headers=True,
+              over_limit=on_over_limit,
+              scope_func=lambda: request.remote_addr,
+              key_func=lambda: request.endpoint):
+    def decorator(f):
+        def rate_limited(*args, **kwargs):
+            key = 'rate-limit/%s/%s/' % (key_func(), scope_func())
+            rlimit = RateLimit(key, limit, per, send_x_headers)
+            g._view_rate_limit = rlimit
+            if over_limit is not None and rlimit.over_limit:
+                return over_limit(rlimit)
+            return f(*args, **kwargs)
+        return update_wrapper(rate_limited, f)
+    return decorator
+
+
+@app.after_request
+def inject_x_rate_headers(response):
+    limit = get_view_rate_limit()
+    if limit and limit.send_x_headers:
+        h = response.headers
+        h.add('X-RateLimit-Remaining', str(limit.remaining))
+        h.add('X-RateLimit-Limit', str(limit.limit))
+        h.add('X-RateLimit-Reset', str(limit.reset))
+    return response
+
+
 @app.route('/latest_items/JSON')
+@ratelimit(limit=60, per=60)
 def latestItemJSON():
     com_items = session.query(Item, Category).filter(Item.category_id==Category.id).order_by(Item.id.desc()).limit(10)
     return jsonify(latest_tems=[item.serialize for item, cat in com_items])
 
 
 @app.route('/categories/<int:category_id>/items/JSON')
+@ratelimit(limit=60, per=60)
 def categoryItemsJSON(category_id):
     items = session.query(Item).filter_by(category_id=category_id).all()
     print(items)
