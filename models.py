@@ -3,10 +3,19 @@ from sqlalchemy.dialects.sqlite import BLOB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
+from sqlalchemy.engine.url import URL
 from passlib.apps import custom_app_context as pwd_context
 
 
 Base = declarative_base()
+DATABASE = {
+    'drivername': 'postgres',
+    'host': 'localhost',
+    'port': '5432',
+    'username': 'recipeapp',
+    'password': 'password',
+    'database': 'recipes'
+}
 
 
 class User(Base):
@@ -47,5 +56,5 @@ class Item(Base):
         }
 
 
-engine = create_engine('sqlite:///recipes.db')
+engine = create_engine(URL(**DATABASE))
 Base.metadata.create_all(engine)

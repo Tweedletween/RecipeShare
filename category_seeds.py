@@ -1,10 +1,20 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.engine.url import URL
 from models import Base, Category
 
 
+DATABASE = {
+    'drivername': 'postgres',
+    'host': 'localhost',
+    'port': '5432',
+    'username': 'recipeapp',
+    'password': 'password',
+    'database': 'recipes'
+}
+
 # Connect to DB and create session
-engine = create_engine('sqlite:///recipes.db')
+engine = create_engine(URL(**DATABASE))
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()

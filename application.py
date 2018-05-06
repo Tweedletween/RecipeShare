@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash,jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.engine.url import URL
 from models import Base, Category, Item, User
 import random, string
 
@@ -15,11 +16,21 @@ from flask import g
 from rateLimit import RateLimit
 from functools import update_wrapper
 
+APP_ROOT = '/home/ubuntu/RecipeShare'
 
 app = Flask(__name__)
+DATABASE = {
+    'drivername': 'postgres',
+    'host': 'localhost',
+    'port': '5432',
+    'username': 'recipeapp',
+    'password': 'password',
+    'database': 'recipes'
+}
+
 
 # Connect to DB and create session
-engine = create_engine('sqlite:///recipes.db')
+engine = create_engine(URL(**DATABASE))
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
@@ -49,7 +60,7 @@ def gconnect():
 
     # Upgrade the authorization code into credentials object
     try:
-        oauth_flow = flow_from_clientsecrets('g_client_secret.json', scope='')
+        oauth_flow = flow_from_clientsecrets(APP_ROOT + '/g_client_secret.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
@@ -75,7 +86,7 @@ def gconnect():
         return response
 
     # Verify that the access token is valid for this app.
-    g_client_id = json.loads(open('g_client_secret.json', 'r').read())['web']['client_id']
+    g_client_id = json.loads(open(APP_ROOT + '/g_client_secret.json', 'r').read())['web']['client_id']
     if result['issued_to'] != g_client_id:
         response = make_response(json.dumps("Token's client ID does not match app's."), 401)
         print "Token's client ID does not match app's."
@@ -146,9 +157,9 @@ def fbconnect():
         return response
     access_token = request.data
 
-    app_id = json.loads(open('fb_client_secret.json', 'r').read())['web']['app_id']
+    app_id = json.loads(open(APP_ROOT+'/fb_client_secret.json', 'r').read())['web']['app_id']
     app_secret = json.loads(
-        open('fb_client_secret.json', 'r').read())['web']['app_secret']
+        open(APP_ROOT+'/fb_client_secret.json', 'r').read())['web']['app_secret']
     url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
         app_id, app_secret, access_token)
     h = httplib2.Http()
@@ -298,7 +309,7 @@ def newItem(category_id):
             pic_name = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
             pic_type = request.files['pic'].content_type.split('/')[-1]
             pic_path = SAVE_PIC_PRE + pic_name + '.' + pic_type
-            request.files['pic'].save('.' + pic_path)
+            request.files['pic'].save(APP_ROOT + pic_path)
 
         # Store new data into DB
         newItem = Item(name=request.form.get('name'),
